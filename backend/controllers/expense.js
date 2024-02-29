@@ -1,9 +1,9 @@
-const Expense = require("../models/expense");
-const User = require("../models/user");
+// const Expense = require("../models/expense");
+// const User = require("../models/user");
 const FileDownloads = require("../models/fileDownloads");
 const sequelize = require("../utils/database");
 const AWS = require("aws-sdk");
-require("dotenv").config();
+// require("dotenv").config();
 
 exports.addExpense = async (req, res, next) => {
   const { amount, desc, category } = req.body;
@@ -26,7 +26,7 @@ exports.addExpense = async (req, res, next) => {
       ),
     ]);
     t.commit();
-    res.json(expense.dataValues);
+    res.json(expense);
   } catch (err) {
     await t.rollback();
     console.log(err);

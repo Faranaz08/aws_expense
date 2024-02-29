@@ -1,5 +1,5 @@
 const SibApiV3Sdk = require("sib-api-v3-sdk");
-require("dotenv").config();
+// require("dotenv").config();
 const { v4: uuidv4 } = require("uuid");
 const ForgotPasswordRequests = require("../models/forgotPasswordRequests");
 const User = require("../models/user");
@@ -17,7 +17,7 @@ exports.postForgotPassword = async (req, res, next) => {
   const transEmailApi = new SibApiV3Sdk.TransactionalEmailsApi();
 
   const sender = {
-    email: "faranazannigeri3142@gmail.com",
+    email: "manupuranic@gmail.com",
     name: "Expense-Tracker",
   };
   const receivers = [

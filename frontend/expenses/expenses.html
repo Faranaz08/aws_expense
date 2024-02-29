@@ -109,9 +109,12 @@
       </div>
       <div class="container rounded expense-container shadow-sm">
         <ul id="expenses" class="list-group"></ul>
-        <div class="page-settings">
+        
+      </div>
+      <div class="container leaderboard rounded shadow">
+        <div class="page-settings" style="display: flex; justify-content: flex-end;">
           <div id="pagination"></div>
-          <select name="perPage" id="perPage">
+          <select name="perPage" id="perPage" style="margin-left: 10px;">
             <option value="5">5</option>
             <option value="10">10</option>
             <option value="25">25</option>
@@ -119,8 +122,6 @@
             <option value="100">100</option>
           </select>
         </div>
-      </div>
-      <div class="container leaderboard rounded shadow">
         <h3 class="heading">Leaderboard</h3>
         <ul id="leaderboard-list" class="list-group"></ul>
       </div>
