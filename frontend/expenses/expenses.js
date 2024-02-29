@@ -9,8 +9,15 @@ const logout = document.getElementById("logout");
 const leaderboardList = document.getElementById("leaderboard-list");
 const showLeaderboardBtn = document.getElementById("showLeaderboard");
 const leaderboardDiv = document.querySelector(".leaderboard");
+const downloadBtn = document.getElementById("download-btn");
+const downloadDiv = document.querySelector(".download");
+const fileDownloadBody = document.getElementById("file-download-body");
+const fileDownloadDiv = document.getElementById("fileDownloads");
+const paginationDiv = document.getElementById("pagination");
+const selectPerPage = document.getElementById("perPage");
 
 const token = localStorage.getItem("token");
+const perPage = localStorage.getItem("perPage");
 
 if (!token) {
   window.location.href = "../login/login.html";
@@ -18,6 +25,7 @@ if (!token) {
 
 logout.addEventListener("click", () => {
   localStorage.removeItem("token");
+  localStorage.removeItem("perPage");
   window.location.href = "../login/login.html";
 });
 
@@ -46,7 +54,7 @@ document.getElementById("premium-btn").addEventListener("click", async (e) => {
       );
       const newToken = result.data.token;
       localStorage.setItem("token", newToken);
-      getExpenses();
+      getExpenses(1);
       alert("You are now a Premium User!");
     },
   };
@@ -133,7 +141,6 @@ showLeaderboardBtn.addEventListener("click", getLeaderboard);
 const displayExpenses = (exp) => {
   const li = document.createElement("li");
   const delBtn = document.createElement("button");
-  const editBtn = document.createElement("button");
 
   const spanAmount = document.createElement("span");
   const spanDesc = document.createElement("span");
@@ -143,7 +150,6 @@ const displayExpenses = (exp) => {
   li.className = "list-group-item";
   li.id = exp.id;
   delBtn.className = "btn btn-danger li-btn delete";
-  editBtn.className = "btn btn-dark li-btn edit";
   spanAmount.className = "span-amount";
   spanCategory.className = "span-category";
   spanDesc.className = "span-desc";
@@ -155,17 +161,14 @@ const displayExpenses = (exp) => {
   symbol.appendChild(document.createTextNode("₹"));
 
   delBtn.appendChild(document.createTextNode("Delete"));
-  editBtn.appendChild(document.createTextNode("Edit"));
 
   delBtn.addEventListener("click", deleteHandler);
-  editBtn.addEventListener("click", editHandler);
 
   li.appendChild(symbol);
   li.appendChild(spanAmount);
   li.appendChild(spanDesc);
   li.appendChild(spanCategory);
   li.appendChild(delBtn);
-  li.appendChild(editBtn);
 
   expenseList.appendChild(li);
 };
@@ -193,27 +196,91 @@ const premiumFeatures = async () => {
     premiumBtn.style.display = "none";
     premiumInfo.style.display = "inline";
     showLeaderboardBtn.style.display = "inline";
+    downloadDiv.style.display = "block";
+    downloadBtn.classList.remove("disabled");
   }
 };
 
-const getExpenses = async () => {
+const showPagination = (pageData) => {
+  paginationDiv.replaceChildren();
+  const {
+    currentPage,
+    isNextPage,
+    isPreviousPage,
+    previousPage,
+    nextPage,
+    lastPage,
+  } = pageData;
+
+  const prevBtn = document.createElement("button");
+  prevBtn.appendChild(document.createTextNode("Prev"));
+  if (isPreviousPage) {
+    prevBtn.className = "btn btn-sm";
+  } else {
+    prevBtn.className = "btn btn-sm disabled";
+  }
+  prevBtn.addEventListener("click", () => getExpenses(previousPage));
+  paginationDiv.appendChild(prevBtn);
+
+  const currentPageSpan = document.createElement("span");
+  currentPageSpan.appendChild(
+    document.createTextNode(`${currentPage}/${lastPage}`)
+  );
+  paginationDiv.appendChild(currentPageSpan);
+
+  const nextBtn = document.createElement("button");
+  nextBtn.appendChild(document.createTextNode("Next"));
+  if (isNextPage) {
+    nextBtn.className = "btn btn-sm";
+  } else {
+    nextBtn.className = "btn btn-sm disabled";
+  }
+  nextBtn.addEventListener("click", () => getExpenses(nextPage));
+  paginationDiv.appendChild(nextBtn);
+};
+
+const getExpenses = async (page) => {
   expenseList.replaceChildren();
   premiumFeatures();
-  // const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
+  const perPage = localStorage.getItem("perPage");
   try {
-    const res = await axios.get(baseUrl, {
+    const res = await axios.get(`${baseUrl}/${page}?perPage=${perPage}`, {
       headers: { Authentication: token },
     });
-    const expenses = res.data;
-    expenses.forEach((exp) => {
-      displayExpenses(exp);
-    });
+    const {
+      expenses,
+      currentPage,
+      isNextPage,
+      isPreviousPage,
+      previousPage,
+      nextPage,
+      lastPage,
+    } = res.data;
+    if (expenses.length === 0) {
+      expenseList.parentElement.innerHTML += `<p style='text-align: center'>No expenses found! Add expenses above.</p>`;
+    } else {
+      expenses.forEach((exp) => {
+        displayExpenses(exp);
+      });
+      showPagination({
+        currentPage,
+        isNextPage,
+        isPreviousPage,
+        previousPage,
+        nextPage,
+        lastPage,
+      });
+    }
   } catch (err) {
     console.log(err);
   }
 };
 
-document.addEventListener("DOMContentLoaded", getExpenses);
+document.addEventListener("DOMContentLoaded", () => {
+  selectPerPage.value = perPage;
+  getExpenses(1);
+});
 
 const submitHandler = async (e) => {
   e.preventDefault();
@@ -228,30 +295,14 @@ const submitHandler = async (e) => {
     category: category.value,
   };
   console.log(expList);
-  // localStorage.setItem(desc.value, JSON.stringify(expList));
-  let editId = document.querySelector(".submit-btn").id;
-  if (editId !== "") {
-    try {
-      const res = await axios.post(
-        `${baseUrl}/edit-expense/${editId}`,
-        expList,
-        { headers: { Authentication: token } }
-      );
-      getExpenses();
-      document.querySelector(".submit-btn").id = "";
-    } catch (err) {
-      console.log(err);
-    }
-  } else {
-    try {
-      const exp = await axios.post(`${baseUrl}/add-expense`, expList, {
-        headers: { Authentication: token },
-      });
-      displayExpenses(exp.data);
-      messageHandler("Expense Added Successfully", "success");
-    } catch (err) {
-      messageHandler(err, "error");
-    }
+  try {
+    const exp = await axios.post(`${baseUrl}/add-expense`, expList, {
+      headers: { Authentication: token },
+    });
+    displayExpenses(exp.data);
+    messageHandler("Expense Added Successfully", "success");
+  } catch (err) {
+    messageHandler(err, "error");
   }
 
   desc.value = "";
@@ -274,16 +325,45 @@ const deleteHandler = async (e) => {
   }
 };
 
-const editHandler = (e) => {
-  const li = e.target.parentElement;
-  const desc = li.querySelector(".span-desc").textContent;
-  const amount = li.querySelector(".span-amount").textContent;
-  const category = li.querySelector(".span-category").textContent;
-  document.querySelector(".submit-btn").id = li.id;
+const downloadManager = async (e) => {
+  try {
+    const result = await axios.get("http://localhost:3000/expenses/download", {
+      headers: { Authentication: token },
+    });
+    if (result.status === 201) {
+      const a = document.createElement("a");
+      a.href = result.data.fileUrl;
+      a.click();
+      response = await axios.get(
+        "http://localhost:3000/expenses/filedownloads",
+        { headers: { Authentication: token } }
+      );
+      const files = JSON.parse(response.data.files);
+      fileDownloadDiv.style.display = "block";
+      files.forEach((file) => displayFiles(file));
 
-  document.getElementById("desc").value = desc;
-  document.getElementById("expense").value = amount;
-  document.getElementById("category").value = category;
+      messageHandler("File Downloaded Successfully", "success");
+    } else {
+      throw new Error(result.data.message);
+    }
+  } catch (err) {
+    console.log(err);
+    messageHandler(err.response.statusText, "error");
+  }
 };
 
+const displayFiles = (file) => {
+  const date = file.createdAt.split("T")[0];
+  const tr = document.createElement("tr");
+  tr.innerHTML += `<td>${date}</td>
+                    <td><a href=${file.fileUrl}>${file.fileUrl}</a></td>`;
+  fileDownloadBody.appendChild(tr);
+  window.location.href = "#fileDownloads";
+};
+
+selectPerPage.addEventListener("change", () => {
+  localStorage.setItem("perPage", selectPerPage.value);
+  getExpenses(1);
+});
+downloadBtn.addEventListener("click", downloadManager);
 form.addEventListener("submit", submitHandler);
