@@ -4,7 +4,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start:dev": "NODE_ENV=production RAZORPAY_KEY_ID=rzp_test_cpzxN1rwK7mEIy RAZORPAY_KEY_SECRET=1iY56NglIoyneMe7wdfykRJw JWT_SECRET=secretKey DB_SCHEMA=expense-fullstack DB_USER=root DB_PASSWORD=root2000 DB_HOST=localhost DB_DIALECT=mysql SENDINBLUE_API_KEY=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 AWS_KEY=AKIAYCVQDXQTEHNCQNF6 AWS_SECRET=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 AWS_BUCKET_NAME=expense-tracker-node node app.js",
+    "start:dev": "NODE_ENV=production RAZORPAY_KEY_ID=rzp_test_GYyz3KHdWD17yQ RAZORPAY_KEY_SECRET=QNzeBaMZtrcYu6ESD2WlaudS JWT_SECRET=secretKey DB_SCHEMA=expenseproj DB_USER=root DB_PASSWORD=faranaz DB_HOST=localhost DB_DIALECT=mysql SENDINBLUE_API_KEY=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 AWS_KEY=AKIAYS2NWSGN6QN32NE7 AWS_SECRET=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 AWS_BUCKET_NAME=expensetrackingbucket node app.js",
     "start": "nodemon app.js"
   },
   "author": "faru",

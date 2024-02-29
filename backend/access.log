@@ -100,3 +100,4 @@
 ::1 - - [29/Feb/2024:19:07:11 +0000] "GET /premium/showLeaderboards HTTP/1.1" 200 85 "http://127.0.0.1:5500/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
 ::1 - - [29/Feb/2024:19:07:57 +0000] "POST /expenses/add-expense HTTP/1.1" 200 148 "http://127.0.0.1:5500/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
 ::1 - - [29/Feb/2024:20:39:29 +0000] "GET /expenses/1?perPage=5 HTTP/1.1" 404 149 "http://127.0.0.1:5500/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+::1 - - [29/Feb/2024:20:40:08 +0000] "GET /expenses/1?perPage=5 HTTP/1.1" 404 149 "http://127.0.0.1:5500/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
